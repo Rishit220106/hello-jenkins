@@ -1,19 +1,25 @@
 pipeline {
     agent any
     environment {
+        // SonarQube configuration
         SONARQUBE = 'sonarqube'
         SCANNER = 'SonarScanner'
         SONAR_PROJECT_KEY = 'hello-python'
-        SONAR_API_TOKEN = credentials('sonar-token')  // Jenkins secret
-        SONAR_HOST_URL = 'http://<JENKINS_VM_IP>:9000'
+        SONAR_API_TOKEN = credentials('sonar-token') // Use Jenkins Secret Text
+        SONAR_HOST_URL = 'http://34.63.72.79:9000'
+
+        // GitHub repository
+        GIT_REPO = 'https://github.com/Rishit220106/hello-python.git'
+        GIT_BRANCH = 'main'
     }
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/<YOUR_USERNAME>/hello-python.git'
+                git branch: "${GIT_BRANCH}",
+                    url: "${GIT_REPO}"
             }
         }
+
         stage('Install & Run Tests') {
             steps {
                 sh '''
@@ -23,6 +29,7 @@ pipeline {
                 '''
             }
         }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
@@ -39,13 +46,14 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy to App VM') {
             steps {
                 sshagent(credentials: ['gce-ssh']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no <app-username>@<APP_VM_IP> "mkdir -p ~/app"
-                        scp -o StrictHostKeyChecking=no -r * <app-username>@<APP_VM_IP>:~/app/
-                        ssh -o StrictHostKeyChecking=no <app-username>@<APP_VM_IP> "
+                        ssh -o StrictHostKeyChecking=no rishit220106@34.46.215.203 "mkdir -p ~/app"
+                        scp -o StrictHostKeyChecking=no -r * rishit220106@34.46.215.203:~/app/
+                        ssh -o StrictHostKeyChecking=no rishit220106@34.46.215.203 "
                           nohup python3 ~/app/app.py > ~/app/app.log 2>&1 &
                         "
                     '''
