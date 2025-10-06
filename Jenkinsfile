@@ -2,28 +2,22 @@ pipeline {
     agent any
 
     environment {
-        // Reference the SonarQube server configured in Jenkins
-        SONARQUBE_SERVER = 'SonarQube-Docker'
-    }
-
-    tools {
-        // Reference the SonarScanner tool configured in Jenkins
-        tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-
+        // Jenkins credential for SonarQube
+        SONAR_TOKEN = credentials('sonar-token')
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                // Checkout your repo
+                // Checkout your Git repository
                 checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Install Python dependencies
+                // Set up Python virtual environment and install requirements
                 sh 'python3 -m venv venv'
                 sh '. venv/bin/activate && pip install -r requirements.txt'
             }
@@ -31,18 +25,14 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                // Run Python tests
+                // Run Python tests using pytest
                 sh '. venv/bin/activate && pytest tests'
             }
         }
 
         stage('SonarQube Analysis') {
-            environment {
-                // This tells the pipeline which server configuration to use
-                SONAR_TOKEN = credentials('sonar-token')
-            }
             steps {
-                // Run SonarQube scanner
+                // Run SonarQube analysis directly via sonar-scanner
                 sh """
                 . venv/bin/activate
                 sonar-scanner \
@@ -57,7 +47,7 @@ pipeline {
 
     post {
         always {
-            // Archive test results and reports if needed
+            // Archive test results (optional)
             junit 'tests/*.xml'
         }
     }
