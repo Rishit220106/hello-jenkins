@@ -8,7 +8,8 @@ pipeline {
 
     tools {
         // Reference the SonarScanner tool configured in Jenkins
-        sonarScanner 'SonarScanner'
+        tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+
     }
 
     stages {
