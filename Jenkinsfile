@@ -35,16 +35,23 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                sh '''
+    steps {
+        script {
+            // Get the installed SonarScanner
+            def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+            
+            sh """
                 . venv/bin/activate
-                sonar-scanner \
+                ${scannerHome}/bin/sonar-scanner \
                   -Dsonar.projectKey=hello-python \
                   -Dsonar.sources=. \
                   -Dsonar.host.url=http://34.61.69.21:9000 \
                   -Dsonar.login=${SONAR_TOKEN}
-                '''
-            }
+            """
+        }
+    }
+}
+
         }
     }
 
