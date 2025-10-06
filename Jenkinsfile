@@ -2,13 +2,13 @@ pipeline {
     agent any
     environment {
         // SonarQube configuration
-        SONARQUBE = 'sonarqube'
-        SCANNER = 'SonarScanner'
+        SONARQUBE = 'sonarqube'                       // SonarQube server name in Jenkins
+        SCANNER = 'SonarScanner'                      // SonarScanner tool name in Jenkins
         SONAR_PROJECT_KEY = 'hello-python'
-        SONAR_API_TOKEN = credentials('sonar-token') // Use Jenkins Secret Text
+        SONAR_API_TOKEN = credentials('sonar-token') // Jenkins Secret Text
         SONAR_HOST_URL = 'http://34.63.72.79:9000'
 
-        // GitHub repository
+        // GitHub repository (SSH)
         GIT_REPO = 'https://github.com/Rishit220106/hello-python.git'
         GIT_BRANCH = 'main'
     }
@@ -16,7 +16,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: "${GIT_BRANCH}",
-                    url: "${GIT_REPO}"
+                    url: "https://github.com/Rishit220106/hello-python.git",
+                    credentialsId: 'github-cred' // Jenkins SSH credential for GitHub
             }
         }
 
