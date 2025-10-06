@@ -24,11 +24,15 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-                // Run Python tests using pytest
-                sh '. venv/bin/activate && pytest tests'
-            }
-        }
+    steps {
+        sh '''
+        . venv/bin/activate
+        export PYTHONPATH=$PYTHONPATH:$(pwd)
+        pytest --junitxml=results.xml tests
+        '''
+    }
+}
+
 
         stage('SonarQube Analysis') {
             steps {
@@ -45,10 +49,11 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            // Archive test results (optional)
-            junit 'tests/*.xml'
-        }
+  	post {
+    always {
+        junit 'results.xml'
+    }
+}
+
     }
 }
