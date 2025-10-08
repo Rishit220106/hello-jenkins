@@ -52,7 +52,7 @@ pipeline {
                         ${scannerHome}/bin/sonar-scanner \
                           -Dsonar.projectKey=hello-python \
                           -Dsonar.sources=. \
-                          -Dsonar.host.url=http://34.61.69.21:9000 \
+                          -Dsonar.host.url=http://35.226.157.63:9000 \
                           -Dsonar.login=${SONAR_TOKEN}
                     """
                 }
